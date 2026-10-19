@@ -58,7 +58,7 @@
   function go(next) {
     if (next === cur) return;
     var s = state[cur];
-    if (s) frames[next].contentWindow.postMessage({ type: 'cc-sync', screen: s.screen, signedOut: s.signedOut }, '*');
+    if (s && s.handoff) frames[next].contentWindow.postMessage({ type: 'cc-sync', handoff: s.handoff }, '*');
     cur = next;
     history.replaceState(null, '', next === 'external' ? '#external' : location.pathname + location.search);
     setTimeout(paint, 30);
@@ -67,7 +67,7 @@
   window.addEventListener('message', function (e) {
     var d = e.data || {}, k = keyOf(e.source);
     if (!k) return;
-    if (d.type === 'cc-state') state[k] = { screen: d.screen, signedOut: d.signedOut };
+    if (d.type === 'cc-state') state[k] = { screen: d.screen, signedOut: d.signedOut, handoff: d.handoff };
     if (d.type === 'cc-toggle-rail') setRail(rail.hidden);
   });
   document.querySelectorAll('.opt').forEach(function (b) { b.addEventListener('click', function () { go(b.dataset.view); }); });
